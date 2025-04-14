@@ -1,13 +1,21 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const path = require("path")
+const basicAuth = require('express-basic-auth');
 const app = express()
 
 // Load environment variables from .env file
 require('dotenv').config();
 
+// Middleware to protect all routes with a password
+app.use(basicAuth({
+    users: { [process.env.ADMIN_USERNAME]: process.env.ADMIN_PASSWORD },
+    challenge: true, // Prompts the browser to show a login dialog
+    unauthorizedResponse: "Unauthorized: Incorrect username or password"
+}));
+
 // Replace hardcoded MongoDB URL with environment variable
-mongoose.connect("mongodb+srv://kg:admin@cluster0.al7mqsv.mongodb.net/database");
+mongoose.connect(process.env.MONGODB_URL);
 
 app.use(express.json()); // Middleware to parse JSON
 app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded data
